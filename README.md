@@ -25,7 +25,11 @@ The source code is found [here](https://github.com/apache/kafka/blob/2.2/streams
         --topic kafka-stream-wordcount-output \
         --config cleanup.policy=compact
     ```
-4. Run the word count demo Java application
+4. Run the word count demo Java application 
+    ```
+    mvn clean package
+    mvn exec:java -Dexec.mainClass=com.flyer.kafka.WordCountDemo
+    ```
 5. Start a producer to write data to the input stream topic
     ```
     kafka-console-producer --broker-list 127.0.0.1:9092 --topic kafka-stream-wordcount-input
@@ -43,6 +47,11 @@ The source code is found [here](https://github.com/apache/kafka/blob/2.2/streams
     ```
 7. When writing data strings via the producer, the consumer should display word counts continuously in a streaming manner
 
+## Note
+1. This demo application is written with [Kafka Streams DSL](https://docs.confluent.io/current/streams/developer-guide/dsl-api.html). It's worthy to rewrite it using low level [Processor API](https://docs.confluent.io/current/streams/developer-guide/processor-api.html).
+2. The default aggregate function `count` involves state store materialization, which has a commit frequency. Based on the `commit.interval.ms` config setting, there will be a delay in aggregation results in the demo. This is better explained in this [SO entry](https://stackoverflow.com/questions/44711499/apache-kafka-streams-materializing-ktables-to-a-topic-seems-slow) and this [article](https://cwiki.apache.org/confluence/display/KAFKA/KIP-63%3A+Unify+store+and+downstream+caching+in+streams). 
+    > The semantics of caching is that data is flushed to the state store and forwarded to the next downstream processor node whenever the earliest of commit.interval.ms or cache.max.bytes.buffering (cache pressure) hits. 
+ 
 
 
 
